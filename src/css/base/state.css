@@ -1,0 +1,31 @@
+/* https://smacss.com/book/type-state/ */
+/* Separate the component from the state */
+
+/* Global State */
+/* Visibility */
+.is-hidden {
+  display: none !important;
+}
+
+/* Feedback */
+.is-loading {
+  opacity: 0.7;
+  pointer-events: none;
+  cursor: wait;
+}
+
+.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* .is-error {} */
+/* .is-success {} */
+
+/* Some of the state should NOT be global  */
+/* Component Scoped State */
+/* .is-open {} */
+/* .is-expanded {} */
+/* .is-collapsed {} */
+/* .is-selected {} */

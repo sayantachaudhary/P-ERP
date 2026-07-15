@@ -1,0 +1,98 @@
+/* Line-height & font size are inversely proportinal */
+/* Stick to 2 color, size, weight */
+/* Use `clamp()` for headings — they need the most scaling */
+
+@font-face {
+  font-family: "inter";
+  src: url("/public/fonts/inter.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 300 500;
+}
+
+@font-face {
+  font-family: "iBMPlexMono";
+  src: url("/public/fonts/iBMPlexMono.ttf") format("woff2");
+  font-display: swap;
+  font-weight: 300 500;
+}
+
+h1 {
+  /* font-size: clamp(var(--text-2xl), 1.7405rem + 0.9044vw, var(--text-4xl)); */
+  font-size: clamp(1.944rem, 1.7405rem + 0.9044vw, 2.4414rem);
+  line-height: 1.1;
+  font-weight: 500;
+}
+
+h2 {
+  line-height: 1.2;
+  font-size: var(--text-3xl);
+  font-weight: 500;
+}
+
+h3 {
+  font-size: var(--text-2xl);
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+h4 {
+  font-size: var(--text-xl);
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+h5 {
+  font-size: var(--text-lg);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+h6 {
+  font-size: var(--text-base);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+p {
+  font-size: var(--text-sm);
+  line-height: 1.75;
+  color: var(--neutral-700);
+  font-weight: 400;
+
+  a {
+    color: var(--neutral-900);
+    border-bottom: 1px solid var(--neutral-500);
+    transition: border-color 0.2s ease-in-out;
+
+    &:hover {
+      border-bottom: var(--neutral-900);
+    }
+  }
+}
+
+blockquote {
+  position: relative;
+  margin-block: calc(var(--spacing) * 8);
+  padding-inline: calc(var(--spacing) * 4);
+
+  /* footer { */
+  /*   margin-top: var(--spacing); */
+  /*   color: var(--neutral-600); */
+  /* } */
+
+  @media (width >=768px) {
+    margin-inline: -1.25rem;
+  }
+
+  ::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0.25rem;
+    height: 100%;
+    background: var(--neutral-800);
+    border-top-right-radius: var(--radius-sm);
+    border-bottom-right-radius: var(--radius-sm);
+  }
+}

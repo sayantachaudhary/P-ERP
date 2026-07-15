@@ -1,0 +1,131 @@
+body {
+  background-image: none;
+}
+
+.bb {
+  margin-top: calc(var(--spacing) * 8);
+}
+
+.post-meta {
+  color: var(--neutral-500);
+  margin-bottom: calc(var(--spacing) * 8);
+}
+
+.post {
+  h1 {
+    margin-bottom: calc(var(--spacing) * 2);
+
+    &:first-of-type {
+      margin-top: calc(var(--spacing) * 8);
+    }
+  }
+
+  h2 {
+    margin-top: calc(var(--spacing) * 8);
+    margin-bottom: calc(var(--spacing) * 4);
+  }
+
+  h3 {
+    margin-top: calc(var(--spacing) * 6);
+    margin-bottom: calc(var(--spacing) * 4);
+  }
+
+  p {
+    line-height: 1.875;
+    margin-bottom: calc(var(--spacing) * 4);
+  }
+
+  img {
+    cursor: zoom-in;
+    border-radius: var(--radius-md);
+
+    &.fullscreen {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      z-index: var(--z-overlay);
+      background: black;
+      cursor: zoom-out;
+    }
+  }
+
+  ul {
+    color: var(--neutral-700);
+    margin-bottom: calc(var(--spacing) * 8);
+    padding-left: calc(var(--spacing) * 6);
+
+    li {
+      list-style: disc;
+      margin-bottom: calc(var(--spacing) * 2);
+    }
+
+    a {
+      color: var(--neutral-900);
+      border-bottom: 1px solid var(--neutral-400);
+      transition: border-color 0.2s ease-in-out;
+
+      &:hover {
+        border-bottom-color: var(--neutral-900);
+      }
+    }
+  }
+
+  /* inline code */
+  code,
+  kbd,
+  samp {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-sm);
+    padding: 0.1em 0.25em;
+    background-color: var(--neutral-200);
+  }
+
+  /* block code */
+  pre {
+    border-radius: var(--radius-md);
+    margin-block: calc(var(--spacing) * 8);
+    padding: calc(var(--spacing) * 4);
+    background-color: var(--neutral-100);
+    overflow-x: auto;
+    white-space: pre;
+
+    >code,
+    >samp {
+      border-radius: 0;
+      padding: 0 !important;
+      background: none;
+    }
+
+    /* Bleed on Desktop */
+    @media (width >=768px) {
+      margin-inline: -1.25rem;
+    }
+  }
+}
+
+.like-btn {
+  .like-count {
+    font-size: var(--text-sm);
+  }
+}
+
+.post-footer {
+  margin-top: calc(var(--spacing) * 8);
+}
+
+/* .breadcrumb ol { */
+/*   margin-top: calc(var(--spacing) * 8); */
+/*   font-size: var(--text-sm); */
+/**/
+/*   li { */
+/*     display: inline-block; */
+/**/
+/*     &:not(:last-child)::after { */
+/*       margin-inline: calc(var(--spacing) * 2); */
+/*       content: "·"; */
+/*     } */
+/*   } */
+/* } */
