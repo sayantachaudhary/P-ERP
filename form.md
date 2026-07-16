@@ -49,6 +49,8 @@ HTML forms first (native browser behavior)
 - <input> and all major input types
 - name, id, value, and label
 - <textarea>, <select>, <option>
+  
+
 - Buttons (submit, button, reset)
 - Validation attributes (required, min, max, pattern, etc.)
 - Form submission (GET, POST, action, method)
@@ -58,44 +60,54 @@ HTML forms first (native browser behavior)
 
 ---
 
-From                  → Text + Autocomplete
-To                    → Text + Autocomplete
-GST                   → Text
-Date                  → Date
-Bill Number           → Readonly
-Machine Name          → Text + Autocomplete
-Machine Number        → Text
-Repair Notes          → Textarea
-
-------------------------------------
-
-Part Name             → Autocomplete
-Quantity              → Number
-Rate                  → Number
-Total                 → Readonly
-
-------------------------------------
-
-Grand Total           → Readonly
-
-------------------------------------
-
-Save                  → Submit Button
-Print                 → Button
-Share                 → Button
+From → Text + Autocomplete
+To → Text + Autocomplete
+GST → Text
+Date → Date
+Bill Number → Readonly
+Machine Name → Text + Autocomplete
+Machine Number → Text
+Repair Notes → Textarea
 
 ---
 
-The id on an <input> is the same global HTML id attribute that you use on any other HTML element.
-React uses htmlFor because for is a reserved keyword in JavaScript.
-The <label> element gives a name (description) to a single form control.
-<fieldset> groups multiple related form input
+Part Name → Autocomplete
+Quantity → Number
+Rate → Number
+Total → Readonly
 
-<input type="radio" id="css" name="fav_language" value="CSS">
-<label for="css">CSS</label><br>
+---
 
-<label for="css">CSS</label><br>
-<input type="radio" id="css" name="fav_language" value="CSS">
+Grand Total → Readonly
 
-which one will be correct
-should i use label after the input or i should use label before the input
+---
+
+Save → Submit Button
+Print → Button
+Share → Button
+
+---
+
+<!-- The id on an <input> is the same global HTML id attribute that you use on any other HTML element. -->
+<!-- React uses htmlFor because for is a reserved keyword in JavaScript. -->
+<!-- The <label> element gives a name (description) to a single form control. -->
+<!-- <fieldset> groups multiple related form input -->
+
+## Datebase
+
+```javascript
+{
+  "date": "2026-07-17",
+  "from": "Krupa Impex",
+  "to": "Khodiyar Textile",
+  "phone": "9876543210",
+  "parts": [
+    {
+      "partName": "Pulley",
+      "quantity": 2,
+      "rate": 40
+    }
+  ],
+  "grandTotal": 80
+}
+```
