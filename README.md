@@ -52,3 +52,9 @@ Search customer by name
 No edit on saved bills
 
 how print works in browser?
+party to party report
+party and date
+
+buying details
+salary
+rent
