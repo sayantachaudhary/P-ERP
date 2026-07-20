@@ -17,7 +17,6 @@ function RepairForm() {
   const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
   const [gst, setGst] = useState("");
-  const [status, setStatus] = useState("due");
   const [partsCatalog, setPartsCatalog] = useState([]);
   const [customerCatalog, setCustomerCatalog] = useState([]);
   const [parts, setParts] = useState([
@@ -63,7 +62,6 @@ function RepairForm() {
     setCustomerName("");
     setPhone("");
     setGst("");
-    setStatus("due");
     setParts([{ id: 1, partName: "", quantity: 1, rate: 0 }]);
   }
 
@@ -82,7 +80,6 @@ function RepairForm() {
       customerName: customerName.trim(),
       phone,
       gst,
-      status,
       items: cleanItems.map((p) => ({
         partName: p.partName.trim(),
         quantity: p.quantity,
@@ -93,8 +90,7 @@ function RepairForm() {
 
     const savedInvoice = await saveInvoice(invoiceData);
     for (const item of savedInvoice.items) await addPartIfNew(item.partName);
-    if (savedInvoice.customerName)
-      await addCustomerIfNew(savedInvoice.customerName);
+    if (savedInvoice.customerName) await addCustomerIfNew(savedInvoice.customerName);
 
     await resetForm();
     setPartsCatalog(await getParts());
@@ -144,7 +140,6 @@ function RepairForm() {
               list="customerOptions"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              placeholder="Company Name"
               required
             />
             <datalist id="customerOptions">
@@ -170,28 +165,16 @@ function RepairForm() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="status">STATUS</label>
-            <select
-              id="status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-            >
-              <option value="due">Due</option>
-              <option value="paid">Paid</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="gst">GST:</label>
+            <label htmlFor="gst">GST</label>
           <input
             type="text"
             id="gst"
             name="gst"
             placeholder="Optional"
-            value={gst}
-            onChange={(e) => setGst(e.target.value)}
-          />
+              value={gst}
+              onChange={(e) => setGst(e.target.value)}
+            />
+          </div>
         </div>
       </fieldset>
 

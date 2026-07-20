@@ -8,8 +8,8 @@ import App from "./App.jsx";
 // import "./css/base/reset.css"
 // import "./css/base/global.css";
 // import "./css/theme/theme.css";
-// import "./css/theme/font.css";
-import "./index.css";
+import "./css/theme/font.css";
+// import "./index.css";
 import "./css/layout/layout.css";
 
 createRoot(document.querySelector("#root")).render(

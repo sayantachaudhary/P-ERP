@@ -39,6 +39,21 @@ function formatInvoiceNo(seq) {
   return "JQ-" + String(seq).padStart(4, "0");
 }
 
+// ---------- payment status (derived, never stored directly) ----------
+
+// invoice.payments is an array of { date, amount }.
+// Status is always computed from that list — never set by hand.
+export function computeStatus(invoice) {
+  const amountPaid = (invoice.payments || []).reduce((sum, p) => sum + p.amount, 0);
+  const balanceDue = Math.max(invoice.total - amountPaid, 0);
+
+  let status = "due";
+  if (invoice.total > 0 && amountPaid >= invoice.total) status = "paid";
+  else if (amountPaid > 0) status = "partial";
+
+  return { amountPaid, balanceDue, status };
+}
+
 // ---------- invoices ----------
 
 // Safe to call anytime (mount, reset, re-render) — does NOT consume a number.
@@ -71,12 +86,14 @@ async function commitNextInvoiceNo() {
 }
 
 // Assigns the real, consecutive invoice number at save time and persists the invoice.
+// New invoices always start with an empty payments array (i.e. status = "due").
 export async function saveInvoice(invoiceData) {
   const invoiceNo = await commitNextInvoiceNo();
   const invoice = {
     ...invoiceData,
     invoiceNo,
     id: invoiceData.id || crypto.randomUUID(),
+    payments: invoiceData.payments || [],
   };
 
   const db = await openDB();
@@ -96,6 +113,32 @@ export async function getAllInvoices() {
       resolve(all);
     };
     req.onerror = () => reject(req.error);
+  });
+}
+
+// Adds a payment against an existing invoice. Returns the updated invoice.
+export async function addPayment(invoiceId, amount) {
+  if (!amount || amount <= 0) throw new Error("Payment amount must be greater than 0");
+
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const store = tx(db, "invoices", "readwrite");
+    const getReq = store.get(invoiceId);
+    getReq.onsuccess = () => {
+      const invoice = getReq.result;
+      if (!invoice) return reject(new Error("Invoice not found"));
+
+      invoice.payments = invoice.payments || [];
+      invoice.payments.push({
+        date: new Date().toLocaleDateString("en-CA"),
+        amount,
+      });
+
+      const putReq = store.put(invoice);
+      putReq.onsuccess = () => resolve(invoice);
+      putReq.onerror = () => reject(putReq.error);
+    };
+    getReq.onerror = () => reject(getReq.error);
   });
 }
 

@@ -37,7 +37,7 @@ so i should store the part name in the database so when i try to add that machin
 
 PostgreSQL or SQLite
 
-![alt text](Proto.jpeg)
+![](Proto.jpeg)
 
 ## Jacquard machine parts
 

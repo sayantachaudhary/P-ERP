@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllInvoices } from "../db.js";
+import { getAllInvoices, computeStatus } from "../db.js";
 
 function startOfWeek(date) {
   const d = new Date(date);
@@ -13,6 +13,7 @@ function startOfWeek(date) {
 function Reports() {
   const [weekTotal, setWeekTotal] = useState(0);
   const [monthTotal, setMonthTotal] = useState(0);
+  const [monthDue, setMonthDue] = useState(0);
   const [byMonth, setByMonth] = useState({});
 
   useEffect(() => {
@@ -23,19 +24,26 @@ function Reports() {
 
       let week = 0;
       let month = 0;
+      let due = 0;
       const monthMap = {};
 
       invoices.forEach((inv) => {
         const invDate = new Date(inv.date + "T00:00:00");
+        const { balanceDue } = computeStatus(inv);
+
         if (invDate >= weekStart) week += inv.total;
 
         const mk = inv.date.slice(0, 7);
-        if (mk === monthKey) month += inv.total;
+        if (mk === monthKey) {
+          month += inv.total;
+          due += balanceDue;
+        }
         monthMap[mk] = (monthMap[mk] || 0) + inv.total;
       });
 
       setWeekTotal(week);
       setMonthTotal(month);
+      setMonthDue(due);
       setByMonth(monthMap);
     });
   }, []);
@@ -50,8 +58,12 @@ function Reports() {
           <h4>₹{weekTotal}</h4>
         </article>
         <article>
-          <small>This Month</small>
+          <small>This Month (Billed)</small>
           <h4>₹{monthTotal}</h4>
+        </article>
+        <article>
+          <small>This Month (Still Due)</small>
+          <h4>₹{monthDue}</h4>
         </article>
       </div>
 
