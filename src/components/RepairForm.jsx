@@ -1,140 +1,220 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  saveInvoice,
+  peekNextInvoiceNo,
+  getParts,
+  addPartIfNew,
+  getCustomers,
+  addCustomerIfNew,
+} from "../db.js";
+
+import "./RepairForm.css";
 
 function RepairForm() {
   const today = new Date().toLocaleDateString("en-CA");
+
+  const [invoiceNo, setInvoiceNo] = useState("");
+  const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
+  const [gst, setGst] = useState("");
+  const [status, setStatus] = useState("due");
+  const [partsCatalog, setPartsCatalog] = useState([]);
+  const [customerCatalog, setCustomerCatalog] = useState([]);
   const [parts, setParts] = useState([
-    {
-      id: 1,
-      partName: "",
-      quantity: 1,
-      rate: 0,
-    },
+    { id: 1, partName: "", quantity: 1, rate: 0 },
   ]);
 
+  useEffect(() => {
+    peekNextInvoiceNo().then(setInvoiceNo);
+    getParts().then(setPartsCatalog);
+    getCustomers().then(setCustomerCatalog);
+  }, []);
+
   function handleAddPart() {
-    setParts((prevParts) => [
-      ...prevParts,
-      {
-        id: Date.now(),
-        partName: "",
-        quantity: 1,
-        rate: 0,
-      },
+    setParts((prev) => [
+      ...prev,
+      { id: Date.now(), partName: "", quantity: 1, rate: 0 },
     ]);
   }
 
   function handleDeletePart(id) {
-    if (parts.length === 1) {
-      return;
-    }
-
-    setParts((prevParts) => prevParts.filter((part) => part.id !== id));
+    if (parts.length === 1) return;
+    setParts((prev) => prev.filter((part) => part.id !== id));
   }
 
-  const grandTotal = parts.reduce((total, part) => {
-    return total + part.quantity * part.rate;
-  }, 0);
-
   function handlePartChange(id, field, value) {
-    setParts((prevParts) =>
-      prevParts.map((part) =>
+    setParts((prev) =>
+      prev.map((part) =>
         part.id === id
-          ? {
-            ...part,
-            [field]: field === "partName" ? value : Number(value),
-          }
+          ? { ...part, [field]: field === "partName" ? value : Number(value) }
           : part,
       ),
     );
   }
 
-  function handleSubmit() {
+  const grandTotal = parts.reduce(
+    (total, part) => total + part.quantity * part.rate,
+    0,
+  );
+
+  async function resetForm() {
+    const nextNo = await peekNextInvoiceNo();
+    setInvoiceNo(nextNo);
+    setCustomerName("");
+    setPhone("");
+    setGst("");
+    setStatus("due");
+    setParts([{ id: 1, partName: "", quantity: 1, rate: 0 }]);
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    alert("handleSubmit");
+
+    const cleanItems = parts.filter((p) => p.partName.trim());
+    if (cleanItems.length === 0) {
+      alert("Add at least one part.");
+      return;
+    }
+
+    const invoiceData = {
+      date: today,
+      from: "Krupa Impex",
+      customerName: customerName.trim(),
+      phone,
+      gst,
+      status,
+      items: cleanItems.map((p) => ({
+        partName: p.partName.trim(),
+        quantity: p.quantity,
+        rate: p.rate,
+      })),
+      total: grandTotal,
+    };
+
+    const savedInvoice = await saveInvoice(invoiceData);
+    for (const item of savedInvoice.items) await addPartIfNew(item.partName);
+    if (savedInvoice.customerName)
+      await addCustomerIfNew(savedInvoice.customerName);
+
+    await resetForm();
+    setPartsCatalog(await getParts());
+    setCustomerCatalog(await getCustomers());
+    alert("Bill saved.");
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <fieldset>
-        <legend>Repair Form</legend>
-        <div className="form-group">
-          <label htmlFor="date">Date:</label>
-          <input
-            type="date"
-            id="date"
-            name="date"
-            defaultValue={today}
-            onClick={(e) => e.target.showPicker?.()}
-            required
-          />
+        <div className="grid">
+          <div className="form-group">
+            <label htmlFor="date">DATE</label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              defaultValue={today}
+              onClick={(e) => e.target.showPicker?.()}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="invoiceNo">INVOICE NO.</label>
+            <input type="text" id="invoiceNo" value={invoiceNo} readOnly />
+          </div>
+        </div>
+
+        <div className="grid">
+          <div className="form-group">
+            <label htmlFor="from">FROM</label>
+            <input
+              type="text"
+              id="from"
+              name="from"
+              defaultValue="Krupa Impex"
+              readOnly
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="customer">TO</label>
+            <input
+              type="text"
+              id="customer"
+              list="customerOptions"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              placeholder="Company Name"
+              required
+            />
+            <datalist id="customerOptions">
+              {customerCatalog.map((name) => (
+                <option key={name} value={name} />
+              ))}
+            </datalist>
+          </div>
+        </div>
+
+        <div className="grid">
+          <div className="form-group">
+            <label htmlFor="phone">PHONE</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={phone}
+              onChange={(e) =>
+                setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+              }
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="status">STATUS</label>
+            <select
+              id="status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="due">Due</option>
+              <option value="paid">Paid</option>
+            </select>
+          </div>
         </div>
 
         <div className="form-group">
-          <label htmlFor="from">From:</label>
+          <label htmlFor="gst">GST:</label>
           <input
             type="text"
-            id="from"
-            name="from"
-            defaultValue="Krupa Impex"
-            readOnly
+            id="gst"
+            name="gst"
+            placeholder="Optional"
+            value={gst}
+            onChange={(e) => setGst(e.target.value)}
           />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="customer">To:</label>
-          <select id="customer" name="customer" defaultValue="" required>
-            <option disabled value="">
-              Select your customer
-            </option>
-            <option value="khodiyar-textile">Khodiyar Textile</option>
-            <option value="radhe-textile">Radhe Textile</option>
-            <option value="om-fabrics">Om Fabrics</option>
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="phone">Phone:</label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            value={phone}
-            onChange={(e) =>
-              setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
-            }
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="gst">GST:</label>
-          <input type="text" id="gst" name="gst" placeholder="Optional" />
         </div>
       </fieldset>
 
       <hr />
 
       <fieldset>
-        <legend>Parts Used</legend>
-        <table>
+        <table className="parts-table">
           <thead>
             <tr>
-              <th>Part Name</th>
-              <th>Qty</th>
-              <th>Rate</th>
-              <th>Amount</th>
-              <th>Action</th>
+              <th>PART NAME</th>
+              <th>QTY</th>
+              <th>RATE</th>
+              <th>AMOUNT</th>
+              {/* <th></th> */}
             </tr>
           </thead>
-
           <tbody>
             {parts.map((part) => (
               <tr key={part.id}>
                 <td>
                   <input
                     type="text"
-                    name="partName"
+                    list="partOptions"
                     placeholder="Search"
                     value={part.partName}
                     onChange={(e) =>
@@ -142,7 +222,6 @@ function RepairForm() {
                     }
                   />
                 </td>
-
                 <td>
                   <input
                     type="number"
@@ -153,7 +232,6 @@ function RepairForm() {
                     }
                   />
                 </td>
-
                 <td>
                   <input
                     type="number"
@@ -164,15 +242,11 @@ function RepairForm() {
                     }
                   />
                 </td>
-
-                {/* <td> */}
-                {/*   <strong>₹{grandTotal}</strong> */}
-                {/* </td> */}
                 <td>₹{part.quantity * part.rate}</td>
-
                 <td>
                   <button
                     type="button"
+                    className="outline"
                     onClick={() => handleDeletePart(part.id)}
                   >
                     🗑
@@ -183,18 +257,21 @@ function RepairForm() {
           </tbody>
         </table>
 
-        <div>
+        <datalist id="partOptions">
+          {partsCatalog.map((name) => (
+            <option key={name} value={name} />
+          ))}
+        </datalist>
+
+        <div className="parts-footer">
+          <button type="button" onClick={handleAddPart}>
+            ➕ Add Part
+          </button>
           <strong>Grand Total: ₹{grandTotal}</strong>
         </div>
-
-        <button type="button" onClick={handleAddPart}>
-          ➕ Add Part
-        </button>
       </fieldset>
 
-      <button type="submit" onClick={handleSubmit}>
-        💾 Save
-      </button>
+      <button type="submit">💾 Save</button>
     </form>
   );
 }

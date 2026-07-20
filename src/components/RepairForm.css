@@ -1,0 +1,22 @@
+/* Parts table inputs — compact + high contrast */
+.parts-table input {
+  width: 100%;
+  max-width: 90px;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.9rem;
+  color: var(--pico-color, #f0f0f0);
+  background-color: var(--pico-form-element-background-color, #1a1c23);
+}
+
+.parts-table input[type="text"] {
+  max-width: 160px;
+}
+
+.parts-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.parts-table thead th {
+  border-bottom: none;
+}
