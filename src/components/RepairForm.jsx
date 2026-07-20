@@ -2,6 +2,7 @@ import { useState } from "react";
 
 function RepairForm() {
   const today = new Date().toLocaleDateString("en-CA");
+  const [phone, setPhone] = useState("");
   const [parts, setParts] = useState([
     {
       id: 1,
@@ -57,7 +58,7 @@ function RepairForm() {
     <form onSubmit={handleSubmit}>
       <fieldset>
         <legend>Repair Form</legend>
-        <div>
+        <div className="form-group">
           <label htmlFor="date">Date:</label>
           <input
             type="date"
@@ -69,26 +70,47 @@ function RepairForm() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="from">From:</label>
-          <input type="text" id="from" name="from" required />
+          <input
+            type="text"
+            id="from"
+            name="from"
+            defaultValue="Krupa Impex"
+            readOnly
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="customer">To:</label>
+          <select id="customer" name="customer" defaultValue="" required>
+            <option disabled value="">
+              Select your customer
+            </option>
+            <option value="khodiyar-textile">Khodiyar Textile</option>
+            <option value="radhe-textile">Radhe Textile</option>
+            <option value="om-fabrics">Om Fabrics</option>
+          </select>
         </div>
 
         <div>
-          <label htmlFor="to">To:</label>
-          <input type="text" id="to" name="to" required />
+          <label htmlFor="phone">Phone:</label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            value={phone}
+            onChange={(e) =>
+              setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+            }
+            required
+          />
         </div>
 
         <div>
-          <label htmlFor="phone">Phone Number:</label>
-
-          <input type="tel" id="phone" name="phone" required />
+          <label htmlFor="gst">GST:</label>
+          <input type="text" id="gst" name="gst" placeholder="Optional" />
         </div>
-
-        {/* <div> */}
-        {/*   <label htmlFor="gst">GST</label> */}
-        {/*   <input type="text" id="gst" name="gst" placeholder="Optional" /> */}
-        {/* </div> */}
       </fieldset>
 
       <hr />
